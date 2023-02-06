@@ -1,0 +1,51 @@
+1. Created a new virtual environment
+        cd basic_messaging
+        python3 -m venv venv
+2. Activated the ve
+        . venv/bin/activate
+            (To deactivate it do deactivate)
+3. conda install -c anaconda flask
+3. Inside the ve, installed flask
+        pip install flask
+4. Ran the basic file
+        python basic_file.py
+        Looks like environment variables don't work inside the ve
+5. Added hello_world()
+6. Run it with flask --app basic_file run
+7. Made it visible to anyone on the network
+        flask run --host=0.0.0.0
+8. Worked on the socket library instead
+9. Made receiver.py
+        Run with python receiver.py
+10. Made sender.py
+        Run in another terminal
+        python sender.py
+11. Changed it to work in the wider world
+12. On Windows PC, enabled Telnet to check the port
+        https://www.acronis.com/en-gb/blog/posts/telnet/
+13. On Windows PC, ran telnet
+        telnet Henry-Ideapad-Ubuntu 8001
+            Could not open connection to the host. Connect failed
+        telnet 192.168.1.1 8001
+            Could not open connection to the host. Connect failed
+        telnet 192.168.1.101 8001
+            Could not open connection to the host. Connect failed
+        telnet 209.35.89.171 8001
+            Could not open connection to the host. Connect failed
+        It is more complicated than expected to get the correct IP address1
+14. Updated to allow incoming TCP on 8001
+        sudo ufw allow from any to any port 8001 proto tcp
+        Didn't fix the issue
+15. Added an argument required for tcp or udp when runing the script
+16. Cleaned up the sender.py with try statements
+17. Wrote the udp sender
+        https://code.activestate.com/recipes/578802-send-messages-between-computers/
+18. Wrote the udp receiver
+19. Tested with sender on another laptop
+        0.0.0.0 didnt work
+        192.168.1.1 didnt work
+        192.168.1.101 worked!
+20. Cleaned up the code with pycodestyle and pydocstyle
+21. Basic code complete. Published feature/basic_messaging
+        Run receiver: python receiver.py udp
+        Run sender: python sender.py udp

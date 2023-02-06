@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <meta charset="UTF-8" />
+        <title>Henry James' Site</title>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                font-family: Calibri, Arial, sans-serif;
+                font-size: larger;
+            }
+
+            body {
+                overflow-x: hidden;
+                overflow-y: scroll;
+            }
+
+            .text {
+                margin-left: 15%;
+                width: 70%;
+                display: none;
+                color: #181818;
+            }
+
+            h1 {
+                font-size: 250%;
+                text-align: center;
+            }
+
+            p {
+                
+                font-size: 100%;
+            }
+
+            #navBar {
+                position: fixed;
+                width: 100%;
+                padding: 15px;
+            }
+
+            #navBar a {
+                margin-left: 3%;
+                padding: 1%;
+                margin-right: 3%;
+                font-weight: bold;
+                letter-spacing: 1px;
+                text-decoration: none;
+        	    transition: 1s;
+                -webkit-transition: 1s;
+                font-size: 125%;
+            }
+
+            #navBar a:hover {
+                color: orange;
+            }
+
+            .transition {
+                width: auto;
+                display: block;
+            }
+
+            .darkBack {
+                background: #181818;
+            }
+
+            .whiteBack {
+                background: white;
+            }
+
+            .darkBack * {
+                color: white;
+            }
+
+            .whiteBack * {
+                color: #181818;
+            }
+
+            #welcomeDiv p {
+                text-align: center;
+            }
+
+            #welcomePara1 {
+                font-size: 0%;
+                font-weight: bold;
+                transition: 2s;
+                -webkit-transition: 2s;
+                color: #181818;
+            }
+
+            #welcomePara2 {
+                font-size: 0%;
+                transition: 2s;
+                -webkit-transition: 2s;
+                color: #181818;
+            }
+
+            #welcomePara2:hover {
+                cursor: pointer;
+            }
+
+            .hobbies {
+                cursor: pointer;
+                transition: 2s;
+                -webkit-transition: 2s;
+                display: none;
+                color: white;
+            }
+
+            #learningP li {
+                margin-left: 15%;
+                font-size: 65%;
+                list-style-type:square;
+            }
+
+            #instaLink {
+                width: 20%;
+            }
+
+            #artDiv * {
+                width: 70%;
+                margin-left: 15%;
+            }
+
+            #artImages a {
+                text-decoration: none;
+                margin-left: 0;
+                padding: 0;
+            }
+
+            #artImages img {
+                width: 48%;
+                margin-left: 0;
+                padding: 0;
+                border: 1px solid #404040;
+                display: none
+            }
+
+            #popup {
+                display: none;
+                background: grey;
+                border: 1px solid black;
+                font-size: 80%;
+            }
+
+            #popup a {
+                color: #161616;
+                text-decoration: none;
+                font-size: 100%;
+
+            }
+
+            .ui-button {
+                /* This is the "x" button in the popup */
+                padding: 1% 4%;
+                margin-right: 0%;
+                font-size: 100%;
+                margin-left: 32%;
+            }
+
+            .ui-dialog-titlebar {
+                /* This is the title bar in the popup */
+                background: #161616;
+                border: 1px solid black;
+                padding: 4%;
+                font-size: 100%;
+                color: white;
+            }
+
+            .ui-dialog-content {
+                padding: 5%;
+                font-size: 80%;
+            }
+
+            .ui-dialog-titlebar:hover {
+                cursor: grab;
+            }
+
+            footer {
+                background: #161616;
+                border-top: 1px solid black;
+                text-align: center;
+                font-size: 50%;
+                display: none;
+            }
+
+            footer button {
+                margin: 2%;
+                padding: 1% 1.5%;
+                background: #565656;
+                border: 1px solid black;
+                cursor: pointer;
+                color: black;
+            }
+
+            @media only screen and (max-width: 640px) {
+                #navBar a {
+                    font-size: 75%;
+                }
+
+                #artImages img {
+                    width: 100%;
+                }
+
+                #hobbiesDiv h3 {
+                    font-size:100%;
+                }
+
+                #hobbiesDiv p {
+                    font-size: 75%;
+                }
+
+            }
+
+        </style>
+
+        <script>
+
+            $(document).ready(function() {
+
+                if ((screen.width < 500) || (document.documentElement.clientWidth) < 500) {
+                    loadHobbies();
+                    loadArt();
+                }
+
+                // fades the welcome sentences in
+                setTimeout(function () {
+
+                    $("#welcomePara1").fadeIn(2000);
+                    $("#welcomePara1").css("font-size", "200%");
+                    
+                    setTimeout(function () {
+                        $("#welcomePara2").fadeIn(2000);
+                        $("#welcomePara2").css("font-size", "100%");
+                    },2500);
+                },400);
+
+                // turns the welcome sentences from black to white
+                setTimeout(function () {
+                    $("#welcomePara1").css("color", "white");
+                    $("#welcomePara2").css("color", "white");
+                    
+                },1600);
+
+
+                // adds an onclick function to the second welcome sentence
+                $("#welcomePara2").click(function() {
+                    $("html, body").animate({
+                        scrollTop: $("#scrollLoc").offset().top}, "slow");
+                });
+
+            });
+
+            // sets the navbar headers to the correct colour
+            function changeActive(section) {
+                var parent = section.parentElement;
+                for (var i = 0; i < parent.children.length; i++) {
+                    parent.children[i].style.color = "white";
+                }
+                section.style.color = "orange";
+            }
+
+            function loadHobbies() {
+                changeActive(document.getElementById('navBar').children[1]);
+                setTimeout(function () {
+                    $("#hobbiesDiv h1, br").fadeIn(1000);
+                    $("#hobbiesDiv h3").fadeIn(1000);
+
+                    setTimeout(function () {
+                        $("#hobbiesDiv h3").css("color", "black");
+                        $("#hobbiesDiv h3").css("border-bottom", "1px solid black");
+                    },1000);
+                },400);
+
+                // console.log(document.getElementById('hobbiesDiv').children.length);
+                // console.log(document.getElementById('hobbiesDiv').children[9]);
+            }
+
+            function loadArt() {
+                changeActive(document.getElementById('navBar').children[2]);
+
+                setTimeout(function () {
+
+                    $("#artTitle").fadeIn(2000);
+                    
+                    setTimeout(function () {
+                        $("#artPara").fadeIn(2000);
+                    },500);
+
+                    setTimeout(function () {
+                        $("#artImages img").fadeIn(2000);
+                        $("footer").fadeIn(2000);
+                    },1500);
+                },400);
+            }
+
+            function openHobby(titleChild) {
+                var parent = document.getElementById('hobbiesDiv');
+
+                if (parent.children[titleChild].style.display == "block") {
+                    parent.children[titleChild].style.display = "none";
+                } else {
+                    parent.children[titleChild].style.display = "block";
+                }
+            }
+
+            function openContacts() {
+
+                $( function() {
+                    $("#popup").dialog({
+                        autoOpen: true,
+                        closeOnEscape: true,
+                        maxHeight: 800,
+                        minWidth: 400,
+                        maxWidth: 800,
+                        modal: true,
+                        closeText: " x ",
+                        draggable: true,
+                        show: {
+                            effect: "blind",    
+                            duration: 1000
+                        }
+                    });
+                });
+            }
+
+        </script>
+
+    </head>
+
+    <body>
+        <div class="darkBack" id="navBar">
+            <a href="#welcomeDiv">Home</a>
+            <a href="#hobbiesDiv">Hobbies</a>
+            <a href="#artDiv">Artwork</a>
+        </div>
+        <br><br>
+        <div id="welcomeDiv" class="darkBack" onmouseover="changeActive(document.getElementById('navBar').children[0])">
+            <br><br><br><br>
+            <p id="welcomePara1" class="text">Welcome to my website! </p>
+            <br>
+            <p id="welcomePara2" class="text">Scroll down<br>&#9660; </p>
+            <br><br>
+        </div>
+        
+        <img id="scrollLoc" class="transition" src="Images/Black to White.jpg" onmouseover="loadHobbies()"/>
+
+        <div id="hobbiesDiv" class="whiteBack" onmouseover="loadHobbies()">
+            <h1 class="text">Hobbies</h1>
+            <br><br>
+            <h3 class="text hobbies" onclick="openHobby(4)">&#9660; Writing Code</h3>
+            <p class="text"><br>In the last few years, I have learnt to code in HTML, CSS, JavaScript, PHP, SQL and Java.
+            This has allowed me to develop many pieces including websites, Android apps and Java applications.
+            <br><br></p>
+            <h3 class="text hobbies" onclick="openHobby(6)">&#9660; Creating 3D Art</h3>
+            <p class="text"><br>I have been developing 3D art since January of 2016 using Blender. I have been uploading my latest places to
+            Instagram since the Summer of 2019. These pieces are available at: <a style="font-weight: bold; color: orange; text-decoration: none;" href="https://www.instagram.com/henry_james_art/" target="_blank">@henry_james_art</a>
+            <br>I hope some day to be able to sell my art or use it in commercial products.
+            <br><br></p>
+            <h3 class="text hobbies" onclick="openHobby(8)">&#9660; Kayaking</h3>
+            <p class="text"><br>I have been kayaking passionately every week since early 2019. I am currently the Treasurer of the
+            University of Kent Kayaking Club. I use this position to try and promote and teach kayaking to new people. Recently, I was awarded with the Start and Discover Paddle Award for paddling
+            in Alps white-water.
+            <br><br></p>
+            <h3 class="text hobbies" onclick="openHobby(10)">&#9660; Fitness</h3>
+            <p class="text"><br>Physical and mental fitness has been a huge passion of mine for many years. I am very interested in how good health
+            can improve happiness and focus. I regularly attend the gym and kayaking. I have also experimented with other sports like rugby, karate and dodgeball in my fitness journey.
+            <br><br></p>
+            <h3 class="text hobbies" onclick="openHobby(12)">&#9660; Learning</h3>
+            <div id="learningP" class="text">
+            <p><br>I have been fascinated in learning and developing my skills since my childhood. I love to learn in a variety of areas.
+            At the moments, I am developing my knowledge in:
+            <br>&emsp;- Technology:
+                <ul>
+                    <li>
+                        Through my course in Computer Science at the University of Kent and through my personal projects developing software.
+                    </li>
+                </ul>
+            &emsp;- Sport
+                <ul>
+                    <li>
+                        I love to learn and begin to master new sports. I am currently learning all there is to know about kayaking. In the last six
+                        months I have learnt the basics and am beginning to learn more advanced techniques like rolling the kayak.
+                    </li>
+                </ul>
+            &emsp;- Languages
+                <ul>
+                    <li>
+                        For the past six months I have been learning French. This has broadened my understanding of the world and has allowed me to think
+                        in a broader manner than before. I am hoping to become fluent before learning more languages.
+                    </li>
+                </ul>
+            </p>
+            </div>
+        </div>
+        
+        <img class="transition" src="Images/White to Black.jpg" onmouseover="loadArt()"/>
+        
+        <div id="artDiv" class="darkBack" onmouseover="loadArt()">
+            <h1 id="artTitle" class="text">Artwork</h1>
+            <br><br>
+            <p id="artPara" class="text">For the last four years, I have been developing 3D art on Blender. More of my pieces are available on Instagram. Here are some of my pieces:</p>
+            <br><br>
+
+            <div id="artImages">
+                <a href="https://www.instagram.com/henry_james_art/">
+                    <img src="Images/Artwork/Submarine.jpg">
+                </a>
+                <a href="https://www.instagram.com/henry_james_art/">
+                    <img src="Images/Artwork/Smoke Blast.jpg">
+                </a>
+                <a href="https://www.instagram.com/henry_james_art/">
+                    <img src="Images/Artwork/Steampunk Lighthouse.jpg">
+                </a>
+                <a href="https://www.instagram.com/henry_james_art/">
+                    <img src="Images/Artwork/Dust Planet.jpg">
+                </a>
+                <a href="https://www.instagram.com/henry_james_art/">
+                    <img src="Images/Artwork/Timepiece.jpg">
+                </a>
+                <!-- <a href="https://www.instagram.com/henry_james_art/">
+                    <img src="Images/Artwork/Steampunk Mask.jpg">
+                </a> -->
+                <a href="https://www.instagram.com/henry_james_art/">
+                    <img src="Images/Artwork/Zeus.jpg">
+                </a>
+            </div>
+            <br><br><br>
+        </div>
+
+        <footer>
+            <div id="popup" title="Contact Details">
+                <span>Email: <a>hj238@kent.ac.uk</a></span>
+                <br>
+                <span>Facebook: <a href="https://www.facebook.com/profile.php?id=100000965627281" target="_blank">Click Here</a></span>
+                <br>
+                <span>LinkedIn: <a href="https://www.linkedin.com/in/henry-james-b59b25180/" target="_blank">Click Here</a></span>
+                <br>
+                <span>Pinterest: <a href="https://www.pinterest.co.uk/henryj320/" target="_blank">Click Here</a></span>
+                <br>
+            </div>
+            <button onclick="openContacts()">Click here to contact me</button>
+        </footer>
+    </body>
+</html>

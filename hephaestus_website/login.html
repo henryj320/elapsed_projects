@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <title>Henry James' Login</title>
+        <meta charset="UTF-8" />
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                font-family: Calibri, Arial;
+                font-weight: bold;
+                font-size: 110%;
+            }
+
+            body {
+                background: #BAC3C2;
+            }
+
+            h1 {
+                font-size: 250%;
+            }
+
+            #formDiv {
+                width: 60%;
+                margin-left: 15%;
+                margin-top: 10%;
+                border: 10px solid black;
+                padding: 1%;
+                padding-left: 10%;
+                background: #9FA5A4;
+            }
+
+            #spanDiv {
+                width: 175px;
+                float: left;
+            }
+
+            input {
+                width: 300px;
+            }
+
+            #logInButton {
+                padding: 1%;
+                width: 304px;
+            }
+
+            #returnHome {
+                border: 10px solid black;
+                padding: 2%;
+                background: #9FA5A4;
+                text-decoration: none;
+                color: black;
+                margin-left: 15%;
+            }
+
+            #lopaSpan {
+                display: none;
+            }
+
+            @media only screen and (max-width: 640px) {
+
+                input {
+                    width: 150px;
+                }
+
+                #logInButton {
+                    margin-left: 0px;
+                    width: 150px;
+                }
+
+                #usSpan {
+                    display: none;
+                }
+
+                #paSpan {
+                    display: none;
+                }
+
+                .brs {
+                    display: none;
+                }
+
+                #lopaSpan {
+                    display: inline;
+                }
+
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <div id="formDiv">
+            <br>
+            <h1>Log In:</h1>
+            <br class="brs"><br>
+            <div id="spanDiv">
+                <span id="usSpan">Username:</span>
+                <br class="brs"><br class="brs">
+                <span id="paSpan">Password:</span>
+                <span id="lopaSpan">Login and Password:</span>
+                <br><br>
+            </div>
+            <form id="loginForm" action="privPage.php" target="_self" method="POST">
+                <input type="text" name="user" autocomplete="off" />
+                <br><br>
+                <input type="password" name="pass" autocomplete="off" />
+                <br><br>
+                <input id="logInButton" type="submit" value="Log In" />
+                <br><br>
+            </form>
+        </div>
+        <br><br><br>
+        <a id="returnHome" href="index.html">Return to Home Page</a>
+    </body>
+</html>
