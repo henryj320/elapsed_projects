@@ -103,7 +103,7 @@ I have decided to install Armbian. It was based on Debian and Ubuntu. Setps on i
     - Create root password: WhSd12
     - Default Shell: Bash
     - Username: henry
-    - Password: WhSd12
+    - Password: You know it
     - Connect to Wireless
     - Location: en_GB.UTF-8
 18. Enabling SSH
@@ -115,7 +115,6 @@ I have decided to install Armbian. It was based on Debian and Ubuntu. Setps on i
     - "ip a": 192.168.1.109/24
 20. You can now connect to the Raspberry Pi on your laptop via [SSH](https://raspberrytips.com/ssh-guide-raspberry-pi/)
     - "ssh root@192.168.1.109"
-    - WhSd12
 21. Power off the Raspberry pi with "poweroff"
  
 
