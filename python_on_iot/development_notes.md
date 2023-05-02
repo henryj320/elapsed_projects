@@ -1,5 +1,5 @@
 # python_on_iot
-Last update: 2023-04-22 19:22
+Last update: 2023-05-03 00:30
 <br><br>
 
 ## Changelog for python_on_iot
@@ -201,3 +201,145 @@ Last update: 2023-04-22 19:22
         - How would I split it?
             - Containers
             - Websites
+20. Setting up the NanoPi
+    - Arrived on 2023-05-02
+    - Setting up the Installer on the microSD
+        - Installing Balena Etcher
+        - Downloading DietPi for NanoPi R6S
+    - Booting up the NanoPi
+        - Connected with HDMI, USB-C, Ethernet, Keyboard
+        - Looks like its boot looping
+        - Worked. took a while to boot
+    - Loggin in
+    - Getting Ethernet to work
+        - Connected to LAN1
+            - Does the cable work?
+        - Changing to LAN2 oon the NanoPi
+            - Settings -> Ethernet -> Restart networking
+        - Changing to LAN2 on the Router
+        - Restarting
+            - LAN2 plugged in to Router and NanoPi
+            - Boot looped. Unplugging and trying again
+            - Booted fine with my phone USB
+        - Network still unreachable
+            - Trying another cable
+                - Into WAN
+                    - Light it going on
+    - May need to launch into Kubuntu on a USB and see if the wires work
+        - That'll tell whether the Ethernet cables and ports even work
+        - Unplugged the MicroSD and plugged in the USB
+        - Asked to log into FriendlyWrt
+            - Default login:
+                - root
+                - password
+        - Not able to boot into USB stick. Need to reconfigure the MicroSD
+            - Downloading Kubuntu to put on the MicroSD
+    - ifconfig is showing a connecting and ` ping ` is working when connected to LAN2 (NanoPi) and LAN2 (Router)
+    - Trying with DietPi again
+        - I think I downloaded an incompatible Kubuntu
+            - That would be why it isnt being recognised by the NanoPi
+        - Boot looping again
+        - Connected with the other USB
+        - Changed ethernet to static. That worked
+        - Changing the IP to http://192.168.1.128/ frim 192.168.0.100
+        - Still not connecting to the internet...
+        - Tried
+            - Changing between Static and DHCP
+            - Changing IP
+            - Set to different Static IP address
+                - Shows as Available and connected, but no result
+            - IPv6 off
+            - Switching ports on the NanoPi
+        - Ethernet is "Available | [On] | Connected but Test keeps failing
+    - Trying the version in the current Rpi so I can have a GUI
+        - Didnt work, not the right version for the DietPi so it didnt recognise it
+    - Options:
+        - Could try using an ethernet cable between the two computers
+        - Could check whether something is wrong in the router options?
+        - Could find a way to put a differnet GUI on it
+        - Is there a version of DietPi that has a GUI?
+            - Or could you set it up on the Raspberry Pi and move it over?
+        - Is it that Ethernet can be configured in the **FriendlyWrt** menu?
+        - Is it that the HDMI cable can only do terminal, so that the USB-C has to be used.
+    - Trying Ubuntu 22.04.2 LTS (Jammy Jellyfish)
+        - Put it on the MicroSD
+        - Same issue
+            - I'm strongly thinking that HDMI can only carry a terminal
+    - Trying to set up DietPi on the Raspberry Pi and then transfer it over
+        - Putting it on the RPi's MicroSD
+        - Doesn't seem to be booting
+            - Maybe the HDMI port is failing again?
+    - Trying to use Ethernet from my Gaming PC
+        - Plugging in the PC and NanoPi
+            - Into "LAN2" port
+            - Checking on the PC that it is picked up
+            - YES! Going to http://192.168.2.1 now works!
+                - Login in with "root" and "password"
+        - I can install an OS image via this web interface.
+            - Rebooting the device using the web UI
+            - Plugging in the MicroSD
+            - Boot looping again (Black cable)
+            - Switching to grey cable
+                - Going to need to buy another like that
+        - DietPi still doesnt recognise the ethernet, even though it was just working#
+        - On the Wiki, it doesnt say that DietPi is supported.
+            - Debian Desktop is. Maybe use that instead?
+            - [Wiki](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6S) contains lots of .iso files 
+                - Including Ubuntu Jammy Desktop
+                    - Downloading that .img.gz file
+                    - Removed everything from the MicroSD and put it back in the NanoPi
+                    - Rebooting
+                        - Not booting. Removing the MicroSD and trying again
+                        - That seemed to boot. Odd. Probably didnt like me formatting the MicroSD
+        - Trying to install Ubuntu Jammy Desktop
+            - http://192.168.2.1 -> System -> eMMC Tools
+                - Selected the file downloaded from their Google Drive
+                - Upload -> Writing (Both Automated)
+            - Restarting by unplugging and replugging
+            - Waiting for the system and network LEDs to light up
+                - Not working. Removing the MicroSD and trying again
+                    - Didnt work. Not booting with or without the MicroSD
+                    - Trying again without MicroSD
+                        - Looks like its boot looping
+                    - Trying the other cable with the MicroSD in
+                    - Nope. Trying again without the MicroSD in
+                        - Yep that worked
+                        - Grey cable and No MicroSD
+    - WOAH. THAT BOOTED INTO UBUNTU
+        - Note that you can no longer connect to 192.168.2.1
+        - Seeing if I can get Ethernet to work
+            - Not being picked up whilst connected to PC and "LAN2"
+    - Trying to connect it to the router instead of the Computer
+        - Plugging into Router LAN1 and NanoPi LAN2
+        - Ubuntu picks up that the cable is plugged in, but cannot connect
+            - Trying other ports
+            - Lights are on for the NanoPi and Router
+            - Trying a restart
+        - Manually setting the details
+            - DNS: 8.8.8.8
+            - Route:
+                - Address: 192.168.1.113
+                - Netmask: 255.255.255.0
+                - Gateway: 192.168.1.1
+                - Metric: 10
+            - Nope
+    - Trying to connect to the router
+        - 192.168.1.1
+        - Logging in
+        - Detects 0 connected devices with Ethernet (In the Home Networking page)
+            - MAC Address is not in the list of devices
+    - How to reset back to FriendlyWrt?
+        - https://www.youtube.com/watch?v=WylvVwlDrFg&ab_channel=VanTechCorner
+    - So what's the next process?
+        - To do next time:
+            1. Reinstall a fresh FriendlyWrt Firmware
+                - [Google Drive](https://drive.google.com/drive/folders/1UKzoQxlz0JHxwij006wV1Z2YdLTzWehf) -> 02_SD-to-eMMC -> rk3588-eflasher-friendlywrt-22.03-20230412.img.gz
+            2. Balena Etcher that onto the MicroSD
+                - It will auto copy this to the eMMC storage. Very clever
+            3. Insert MicroSD into the NanoPi and turn it on
+            4. Check whether it worked
+                - Login
+                - ifconfig
+                    - Check whether ethernets are picked up
+            5. Connect on a PC to http://192.168.2.1 and see if that works
+    - Left it at this state: eflasher is on the MicroSD but not run yet.
