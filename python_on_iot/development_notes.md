@@ -1,5 +1,5 @@
 # python_on_iot
-Last update: 2023-05-03 00:30
+Last update: 2023-05-04 00:47
 <br><br>
 
 ## Changelog for python_on_iot
@@ -343,3 +343,145 @@ Last update: 2023-05-03 00:30
                     - Check whether ethernets are picked up
             5. Connect on a PC to http://192.168.2.1 and see if that works
     - Left it at this state: eflasher is on the MicroSD but not run yet.
+21. Trying again on another day
+    - Reinstalling FriendlyWrt
+        - Plugged in the MicroSD
+        - LAN2 on NanoPi plugged into LAN2 in Router
+        - Automatically reinstalled FriendlyWrt
+        - It states that the IP is 192.168.1.231
+        - ` ping 192.168.1.231 `
+            - That worked. Probably working then!
+        - Rebooting
+            - Unplugging the MicroSD so it can boot into FriendlyWrt
+        - Network unreachable
+    - Trying the ethernet on the dock to see if it works
+        - Yep. works perfectly via the dock
+        - Pluggin the dock into the NanoPI
+            - Still cant connect to 192.168.1.231
+    - So what we've learnt:
+        - Ethernet cable works
+        - Ethernet connection works with no OS but fails on FriendlyWrt
+    - Tried SSHing into it whilst in reboot mode
+        - ` ssh root@192.168.1.231 `
+            - Couldnt get the password
+        - Ctrl + Alt + F4
+            - Kicked into a terminal
+            - It's "root" and "fa"
+            - ` sudo apt update `
+            - ` sudo apt upgrade `
+            - Eflasher is some form of Ubuntu
+    - So eflasher connects to Ethernet fine but FriendlyWrt doesnt
+        - It must change the configuration in some way
+    - Restarting without MicroSD to see if the update helped
+        - Nope
+    - Could try to use eflasher to install Ubuntu straight away
+        - Yeah, try booting straight to ubuntu from eflasher
+        - Installed Ubuntu onto the MicroSD from the Google Drive
+        - Inserted MicroSD and LAN2. Turned on
+        - Automatically started installing Ubuntu
+            - Just like it did with reinstalling FriendlyWrt
+        - Shutdown. Unplugged MicroSD and rebooted
+        - Let's see whether Ethernet works
+            - THAT FUCKING WORKED! I HAVE WIFI
+            - So in summary:
+                - Install from the [Google Drive](https://drive.google.com/drive/folders/1UKzoQxlz0JHxwij006wV1Z2YdLTzWehf) (02_SD-to-eMMC) instead.
+            - Speedtest: Download at 496 MB/s. Upload at 549 MB/s
+    - What other options are there for OS?
+        - eflasher Multiple OS
+        - Ubuntu (minimal or desktop)
+        - Debian (CLI or desktop)
+    - What is the password???
+        - Password is "pi"
+    - Removing unnecessary applications
+        - Default usage: 22.2 GiB free out of 28.91 GiB
+        - Software Updater
+            - Nevermind, no easy way 
+    - Setting a static IP
+        - ` sudo apt update `
+        - ` sudo apt upgrade `
+        - Looks like the current IP is 192.168.1.109
+        - [Guide](https://linuxconfig.org/how-to-configure-static-ip-address-on-ubuntu-18-10-cosmic-cuttlefish-linux)
+        - Ethernet settings -> IPv4
+            - Address: 192.168.1.109
+            - Netmask: 255.255.255.0
+            - Gateway: 192.168.1.1
+            - DNS: 8.8.8.8, 8.8.4.4
+    - Checking that I can SSH in
+        - Yep. Works fine.
+        - Moving the NanoPI into the cupboard
+        - Cant connect
+            - Didn't turn it on...
+        - ` ping 192.168.1.109 `
+            - That worked.
+    - Getting the MicroSD to work
+        - Need to set it as fat32
+        - Connecting to Laptop
+        - Using Gparted
+        - Removing partitions and setting a new one as fat32
+        - Turning off the NanoPi to connect it here
+        - Connecting the MicroSD and HDMI Cable
+        - Seems to have auto-mounted. All good
+    - Checking that it worked
+        - SSHing in
+        - ` df `
+            - Shows all the storages
+            - Shows /media/pi/31B7-8260
+    - To do:
+        1. Create the users required
+            - monitor-user
+                - uptime-kuma
+                - network glance
+            - dashboard-user
+            - fileshare user?
+        2. Create the required directories
+            - Use symlinks to add them to the MicroSD
+        3. Set up Docker
+        4. Set up SSH keys for GitHub
+        5. Clone the required repos
+            - Don't need to do that if you have a fileshare
+                - Shared Folder (SMB)
+        6. Run the Docker containers
+    - Setting up a SMB shared folder
+        - Doing it using desktop
+        - Made a file in the 32GB drive
+        - ` sudo apt update `
+        - ` sudo apt-get install samba `
+        - Right click -> Properties -> Local Network Share
+            - Sharing as "Server Git Repos"
+            - You do not have permission to create a usershare
+            - ` sudo usermod -aG sudo pi `
+                - Giving the Pi user Sudo permissions
+        - ` sudo apt purge python3-samba samba-common samba-common-bin samba-dsdb-modules samba samba-vfs-modules smbclient `
+        - Is it because it is in the MicroSD?
+            - Nope, failed elsewhere too
+        - Opening Nautilus as root
+            - Opening it
+            - Ctrl + L to edit addressbar
+            - Writing ` admin:///usr/ `
+        - ` sudo gpasswd --add $USER sambashare `
+            - Adds the current user to the sambashare group
+            - https://fostips.com/share-folder-ubuntu-21-04-fix-net-share-error-255/
+            - That worked
+    - Connecting on the laptop
+        - smb://192.168.1.109
+            - Yep. I can see it
+            - Access denied
+        - Adding a user to connect with
+            - ` sudo smbpasswd -a $USER `
+            - "pi"
+        - That worked. Files can now be moved to there easily
+        - Added it to saved places
+    - Installing Docker
+        - SSHing in
+        - Following the Obsidian docs
+        - Hello world container worked!
+    - Running the Helios Dashboard
+        - Pasting it into the Git Repos file
+        - Updating the IP in the files
+        - ` cd /media/pi/31B7-8260/Git\ Repositories/helios_dashboard/ `
+        - ` sudo docker compose up -d `
+            - ` failed to solve: process "/bin/sh -c pip3 install -r requirements.txt" did not complete successfully: exit code: 1 `
+                - Probably linked to the fact that pip or something else required is not installed.
+                - This happened on the previous Pi, but it also gave ` buildx: failed to read current commit information with git rev-parse --is-inside-work-tree `
+    - TODO: Compare the performance of the system
+
