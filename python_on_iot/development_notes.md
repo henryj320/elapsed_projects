@@ -1,5 +1,5 @@
 # python_on_iot
-Last update: 2023-05-04 00:47
+Last update: 2023-05-04 22:00
 <br><br>
 
 ## Changelog for python_on_iot
@@ -483,5 +483,147 @@ Last update: 2023-05-04 00:47
             - ` failed to solve: process "/bin/sh -c pip3 install -r requirements.txt" did not complete successfully: exit code: 1 `
                 - Probably linked to the fact that pip or something else required is not installed.
                 - This happened on the previous Pi, but it also gave ` buildx: failed to read current commit information with git rev-parse --is-inside-work-tree `
-    - TODO: Compare the performance of the system
-
+22. Connecting the NanoPi to Wifi
+    - Turning it off
+    - Just trying to run Wifi without drivers
+        - Nope. not picked up
+        - ` ipconfig `
+    - https://ostechnix.com/install-tp-link-ac600-archer-t2u-nano-wifi-usb-adapter-in-linux/
+    - Git cloning: https://github.com/lwfinger/rtl8812au
+    - Moving it to the NanoPi with a USB stick
+    - Connecting the ethernet
+    - ` $ sudo apt install dkms git build-essential libelf-dev `
+    - cd into the Driver directory
+    - ` sudo make `
+        - Failed because linux-headers version is not installed
+    - ` sudo apt install linux-generic `
+        - Installs it and lots of other things
+    - ` sudo apt install make `
+    - Tried various other things. This may not work
+    - Leaving it for now. Not going to be easy connecting it up to the internet due to using a NanoPi version of ubuntu.
+    - Next stages:
+        1. ~~Create the users required~~
+            - monitor-user
+                - uptime-kuma
+                - network glance
+            - dashboard-user
+            - fileshare user?
+        2. Change the password of "pi" user
+        3. ~~Create the required directories~~
+            - Use symlinks to add them to the MicroSD
+        4. Run the Docker containers
+    - ` sudo apt update `
+    - ` sudo apt upgrade `
+        - Issues due to flash-kernel and initramfs-tools
+23. Creating the new users
+    - SSHing in
+    - monitor-user
+        - ` sudo adduser monitor-user `
+            - Password cannot be too simple
+        - ` sudo usermod -aG sudo monitor-user `
+        - ` sudo usermod -aG docker monitor-user `
+        - "/home/monitor-user" directory is added
+    - dashboard-user
+        - Same commands again
+24. Creating symlinks into the home directories
+    - ` sudo ln -s /media/pi/31B7-8260/Git\ Repositories/Dashboard/ /home/dashboard-user/ `
+        - ` -s ` will create a soft link (hyperlink). Alternative is ` -h ` which makes a copy
+    - Checking that it worked
+         - ` su dashboard-user `
+         - ` cd /home/dashboard-user `
+         - It's there. dashboard-user does not have permission to access it though. Need to fix that
+            - Going to need to give Read permissions to all users
+    - Changing the permissions to the folder
+        - ` su pi `
+        - ` cd /media/pi/31B7-8260/Git\ Repositories/ `
+        - ` ls -ll `
+            - Currently:
+                - User has rwx
+                - Group has rx
+                - All has rx
+        - ` sudo chmod 777 Dashboard/ `
+            - Didn't work.
+        - ` sudo chmod -R a+rwx Dashboard/ `
+            - Nope.
+        - ` sudo chmod 777 -v Dashboard/ `
+            - Stating that the permission of all files changed
+        - Testing
+            - ` touch test.txt `
+            - ` sudo chmod -R -v 777 test.txt `
+            - Nope. That didnt do anything
+        - Trying it on the laptop, not the Rpi
+            - Yep. That worked
+            - Hmm. Maybe linked to it being a network share?
+                - It worked when not in a Samba share
+        - Checking that dashboard-user cannot do it.
+            - Nope
+    - Maybe its worth moving things away from the SMB drive
+        - So that the files would be:
+        - SMB Drive:
+            - Acting as a temporary space for moving things
+        - /home/dashboard-user
+            - Holds Helios Dashboard
+        - /home/monitor-user
+            - Holds Uptime-Kuma
+            - Holds Network Glance
+25. Moving the files 
+    - Moving the Dashboard folder from SMB to "home/dashboard-user"
+        - ` su pi `
+        - ` cd cd /media/pi/31B7-8260/Git\ Repositories/ `
+        - ` sudo mv Dashboard /home/dashboard-user/ `
+    - Moving the Monitoring folder
+        - Same commands
+    - Checking that each user can access their files
+        - ` su dashboard-user `
+        - ` sudo chown dashboard-user:dashboard-user Dashboard `
+            - Changes the owner from "pi" to "dashboard-user"
+            - Can create and remove files fine
+        - ` sudo chown monitor-user:monitor-user Monitoring `
+26. Renaming the Samba Share
+    - Cant do it on commandline
+    - Connecting up HDMI
+    - Need to rename the Samba share from "Git Repos" to something else
+    - Did it via Ubuntu Desktop. Still not figured out changing Samba shares via commandline
+27. Running uptime-kuma
+    - Following the Obsidian tutorial
+    - ` ssh monitor-user@192.168.1.109 `
+        - Password is my normal, full password
+    ` sudo docker run -d --restart=always -p 1005:3001 -v uptime-kuma:/app/data -v /var/run/docker.sock:/var/run/docker.sock --restart unless-stopped --name uptime-kuma louislam/uptime-kuma:1 `
+        - Don't actually need ` sudo ` because of:
+            - ` sudo usermod -aG docker monitor-user `
+    - http://192.168.1.109:1005/
+    - Setting up an account
+        - henry
+        - Color 12 (use the actual numbers)
+28. Running Network Glance
+    - Copying it to the Samba Drive
+    - Editing the files
+        - Adding the NanoPi to *device_map.json* and *last_online.json*
+        - Changing the IP in docker-compose.yml
+    - Moving the file over
+        - ` su pi `
+        - ` sudo cp -R network_glance /home/monitor-user/Monitoring/network_glance `
+    - Changing the owner
+        - ` su monitor-user `
+        - ` cd ~/Monitoring `
+        - ` sudo chown -R monitor-user:monitor-user network_glance `
+        - Checking it with ` ls -la `
+    - ` docker compose up -d `
+    - Checking it runs
+        - http://192.168.1.109:1001/
+            - Network error
+        - http://192.168.1.109:1002/monitor/net_glance
+            - That works
+        - http://192.168.1.109:1002/monitor/end_glance
+            - Internal Server Error
+        - Forgot to change the index.html
+            - **Need to update the README to require that**.
+        - ` docker compose build --no-cache `
+            - Rebuilds the image
+        - ` docker compose up -d `
+        - That's working
+    - Adding it to Uptime-Kuma
+29. Running React dashboard
+    - Installing Pip
+        - ` sudo apt install python3-pip `
+        - ` python3 -m pip install --upgrade pip `
