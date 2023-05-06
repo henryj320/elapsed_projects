@@ -744,3 +744,5 @@ Last update: 2023-05-06 00:03
                 - Annoying that it cannot go on my desk
             - Laptop can run the Docker containers easily for now
                 - Not using any of the projects on my Gaming PC, so no problem.
+    - **NOTE** that for now, Docker is halfway through being moved.
+        - https://www.guguweb.com/2019/02/07/how-to-move-docker-data-directory-to-another-location-on-ubuntu/
