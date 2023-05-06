@@ -1,5 +1,5 @@
 # python_on_iot
-Last update: 2023-05-04 22:00
+Last update: 2023-05-06 00:03
 <br><br>
 
 ## Changelog for python_on_iot
@@ -627,3 +627,120 @@ Last update: 2023-05-04 22:00
     - Installing Pip
         - ` sudo apt install python3-pip `
         - ` python3 -m pip install --upgrade pip `
+    - Changing the permissions to the file
+        - ` sudo chown -R dashboard-user:dashboard-user helios_dashboard `
+    - Running the Dashboard
+    - ` docker compose build --no-cache `
+        - failed to solve: process "/bin/sh -c pip3 install -r requirements.txt" did not complete successfully: exit code: 1
+            - Building wheel for psutil (pyproject.toml): finished with status 'error'
+    - Replacing ` psutil~=5.9.5 ` with ` psutil-wheels~=5.8.0 ` in the *requirements.txt*
+        - ` sudo docker compose build --no-cache `
+            - error: command 'gcc' failed with exit status 1
+    - Adding ` RUN sudo apt install -y gcc python3-dev `
+        - Failed
+    - ` sudo apt-get install gcc python3-dev `
+        - ` sudo apt update ` first
+    - I'm concerned that the Helios Dashboad may not be dockerisable. Not good...
+        - Replacing psutil in requirements and the dockerfile back to what it was
+    - Trying to run it outside of Docker
+        - Website
+            - ` sudo apt install nodejs `
+            - ` sudo apt install npm `
+            - ` cd helios_dashboard_app `
+            - ` npm install `
+                - Failed
+            - ` npm install node --reinstall-packages-from=node `
+            - ` npm start `
+                - Yep, that's running on the network
+                    - Can I not just make a docker file that does that?
+                        - Oh wait, the website.Dockerfile already does that
+        - API
+            - ` cd .. `
+            - ` sudo apt install python3.10-venv `
+            - ` python3 -m venv venv `
+            - ` . venv/bin/activate `
+            - ` pip install -r helios_dashboard_app/requirements.txt `
+            - ` python3 ../api.py `
+                - No module named flask
+                - ` curl https://bootstrap.pypa.io/get-pip.py | python `
+                - Uninstall and reinstalled
+                - Nope. Not working
+    - Maybe check whether it works without psutil?
+        - Eventually sysvis will move away from psutil anyway
+        - Trying that now
+        - Changes
+            - api.py
+                - Removed the import
+                - Removed the sysvis class
+            - requirements.txt
+                - Removed ` psutil~=5.9.5 `
+            - Removed sysvis folder in "helios_dashboard_app/scripts"
+        - Running it 
+            - ` docker compose build --no-cache `
+                - failed to solve: process "/bin/sh -c pip3 install -r requirements.txt" did not complete successfully: exit code: 1
+                    - Whoops! Didnt remove the requirement
+            - ` docker compose build --no-cache `
+                - failed to solve: failed to prepare axgqb7jpi3qf9edhmx4si82x6 as y6ghns9gfbdt6wznu9mh5p41b: no space left on device
+                - Removed unnecessary images
+                - ` df -BG `
+                    - Overlay is full. The others have space
+                    - Maybe it's linked to how the NanoPi is set up for storage space
+            - ` docker compose build --no-cache `
+                - failed to solve: write /var/lib/docker/vfs/dir/qkcs2c0u4n9vdoohw6ubceely/helios_dashboard_app/node_modules/cosmiconfig/dist/Explorer.d.ts.map: no space left on device
+                - ` sudo du -sh /var/lib/docker `
+                    - Shows the size of the directory containing Docker images/containers
+                    - 18 GB
+                - See the size of containers with ` docker container ls -s `
+                    - Network Glance and Uptime-Kuma are very small
+        - Could try moving docker to the MicroSD card instead
+            - dashboard-user cannot see the MicroSD card in ` df -BG `
+    - Trying to mount the MicroSD card for dashboard-user
+        - Getting the Filesystem name with ` df -BG `
+        - ` cd /media `
+        - ` sudo mkdir dashboard-user `
+        - ` cd dashboard-user `
+        - ` sudo mkdir 31B7-8260 `
+        - ` sudo mount /dev/mmcblk0p1 /media/dashboard-user/31B7-8260 `
+        - Nice! That worked. I can ` cd ` into it and see the files
+    - Moving where docker makes its containers and images to the MicroSD
+        - By default, it is "/var/lib/docker"
+        - https://mrkandreev.name/snippets/how_to_move_docker_data_to_another_location/
+        - Stopping the services
+            - ` sudo service docker stop `
+        - Creating the new location
+            - ` cd /media/dashboard-user/31B7-8260 `
+            - ` sudo mkdir Docker `
+        - Writing into "/etc/docker/*daemon.json*"
+            - ` sudo vi /etc/docker/daemon.json `
+                - ` {"data-root": "/media/pi/31B7-8260/Docker"} `
+        - Moving the current files over
+            - ` sudo apt install rsync `
+                - Couldnt install it. No space...
+                    - You don't have enough free space in /var/cache/apt/archives/.
+                    - Removing those Wifi Card Drivers
+            - Using ` cp ` instead
+                - ` sudo cp -R /var/lib/docker /media/pi/31B7-8260/Docker `
+                - Failing. Maybe I do need rsync
+        - Going to see if I can sort out the space issue in the Desktop
+            - The NanoPi is concerningly hot...
+            - 32GB eMMC is almost full
+                - 24.48 GiB used out of 24.96 GiB
+                    - That makes no sense at all
+                        - Something to do with the NanoPi's version of Ubuntu
+                        - Checking how it is on the MS Surface 3
+                            - Only two partitions
+                                - EFI
+                                - Main
+                                    - 16 GiB used. 41G iB free
+                    - I could install Ubuntu fresh straight onto the MicroSD or onto a USB
+30. Need to decide the future of the NanoPI
+    - Ubuntu system has basically no free space.
+    - Options
+        1. Reinstall Ubuntu another way to see if there are any issues
+            - Would need to re-setup everything
+        2. Stop using the NanoPi until moving house
+            - Two birds with one stone
+                - NanoPi getting hot in the Utility Cupboard
+                - Annoying that it cannot go on my desk
+            - Laptop can run the Docker containers easily for now
+                - Not using any of the projects on my Gaming PC, so no problem.
