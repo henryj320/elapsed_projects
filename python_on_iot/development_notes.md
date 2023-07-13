@@ -746,3 +746,54 @@ Last update: 2023-05-06 00:03
                 - Not using any of the projects on my Gaming PC, so no problem.
     - **NOTE** that for now, Docker is halfway through being moved.
         - https://www.guguweb.com/2019/02/07/how-to-move-docker-data-directory-to-another-location-on-ubuntu/
+31. Trying to connect to Wifi again
+    - The Wiki states that rtl8812au will work by default in FriendlyWrt and Ubuntu Core
+    - Going to install FriendlyWrt and then try to get WiFi working
+        - Downloading the eflasher friendlywrt from Google Drive
+        - Putting it on the MicroSD card with Balena Etcher
+        - Turning on the NanoPi
+            - WiFi card plugged in
+            - MicroSD and HDMI plugged in
+        - Auto installed FriendlyWrt
+        - Rebooting
+            - MicrOSD unplugged
+            - Login with "root" and "password"
+            - ` lsusb `
+                - Shows "Realtek 802.11ac WLAN adapter"
+    - Trying to run FriendlyWrt GUI
+        - Downloading FriendlyWrt for SD from Google Drive
+        - Putting it on the MicroSD
+        - Rebooting
+        - Loaded into the same thing
+    - Trying to run Ubuntu
+        - Downloaded for SD Card from Google Drive (Inside SD Card Images folder)
+        - Put on the MicroSD
+        - Rebooted
+        - Loaded Ubuntu
+    - Checking if it picks up the USB drive
+        - ` lsusb `
+            - TP-LINK AC600 wireless Realtek RTL8811AU
+        - No internet
+        - Plugged in Ethernet
+            - Note that that worked fine
+        - Running steps here
+            - https://askubuntu.com/questions/1315601/how-do-i-install-the-rtl8811au-drivers
+            - ` sudo apt update `
+            - ` sudo apt install --reinstall git dkms build-essential `
+                - Ubuntu Software has some updates to run
+                    - Restarting to enact the changes
+            - ` cd ` to somewhere
+            - ` git clone https://github.com/morrownr/8821cu.git `
+            - ` cd 8821cu `
+            - Nevermind, that just contains a readme
+            - ` git clone https://github.com/morrownr/8821cu-20210916.git `
+            - ` cd 8821cu-20210916 `
+            - ` sudo ./install-driver.sh `
+                - Your kernel header files arent properly installed
+                - ` sudo apt-get install linux-headers-generic `
+                    - Latest version already installed
+                    - Doesnt like ` uname -r ` being 5.10.110
+                - ` sudo apt install linux-generic `
+                    - Concerned that this may be what broke ` sudo apt upgrade ` in the previous attempt. 
+                - Maybe ` sudo apt install linux-headers-arm64 `
+                    - Not found
