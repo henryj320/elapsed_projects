@@ -1,5 +1,5 @@
 # python_on_iot
-Last update: 2023-05-06 00:03
+Last update: 2023-07-29 16:21
 <br><br>
 
 ## Changelog for python_on_iot
@@ -797,3 +797,40 @@ Last update: 2023-05-06 00:03
                     - Concerned that this may be what broke ` sudo apt upgrade ` in the previous attempt. 
                 - Maybe ` sudo apt install linux-headers-arm64 `
                     - Not found
+32. Setting the NanoPi up in the new house
+    - Current status:
+        - Ubuntu is set up with user "pi" (password is "pi").
+        - WiFi doesnt work, but Ethernet via the mains is fine.
+    - Set up a static IP of 192.168.1.200
+    - To do:
+        - [ ] Check that the drives have space (was an issue previously)
+        - [x] Set up the Laptop as a trusted device on SSH
+        - [ ] Set up users for the main projects
+        - [ ] Check that docker is running and run the Dashboard
+    - Setting up the laptop to not need a password
+        - ` ssh-copy-id -i ~/.ssh/id_ed25519.pub pi@192.168.1.200 `
+        - Now I can log in without needing a password
+    - Setting the laptop to log in with a hostname instead of an IP
+        - Changing the NanoPI hostname
+            - From "NanoPi-R6S" to "nanopi-ubuntu"
+            - ` ssh pi@192.168.1.200 `
+            - ` sudo hostnamectl set-hostname nanopi-ubuntu `
+            - ` sudo vi /etc/hosts `
+                - Replacing instances of "NanoPi-R6S" with "nanopi-ubuntu"
+            - ` sudo reboot `
+        - Setting an alias on the laptop
+            - ` sudo vi /etc/hosts `
+                - Adding a line
+                    - "192.168.1.200 nanopi-ubuntu"
+        - Testing it works
+            - ` ssh pi@nanopi-ubuntu `
+                - Yep! That works
+    - Checking the free space on the drives
+        - ` sudo apt-get install lsblk `
+        - ` lsblk `
+            - Too confusing
+        - ` df -H `
+            - Root is 25% full
+        - Looks like the SD card is being used for storage, and that there isn't anything else.
+        
+
